@@ -86,15 +86,17 @@ this.todos = [...this.todos.filter((t) => t.id !== todoUpdated.id), todoUpdated]
 - *ngrxLet directive will create an embedded view when an observable emits a value, regardless of whether it is truthy or falsy. It handles the zero problem. (Zero is a falsy value so it is difficult to conditionally render something when a successful api request returns nothing) 
 - I think *ngrxLet implementation is unnecessary in this implementation.  The api will never return 0 todos and to have zero todos rendered in the html a user would need to delete 200 todos.   
 - Adding *ngrxLet is not free since you need to add another dependency - @ngrx/component.  
-- In Thomas's solution, he uses a switchMap and {debounce: true}.  I associate switchMap more so with inputs versus debouncing button clicks.  switchMap is needed to unsubscribe to many clicks of the update button and deliver the last randText() call.  
-- Seems like randText() call is synchronous.  Need to look into the documentation but if it is, then is the debounce flag necessary?
-- This is a common theme in my thoughts to his solution - overengineered.  The bugs prevented against are unlikely to occur.  
-- Used a simplified callState with just a string - versus an enum with various states and a separate errorState.
-- Used a global spinner that renders when callState is "loading" - use toLowerCase on callState in the html.  
+- In Thomas's solution, he uses a switchMap and {debounce: true}.  switchMap is needed to unsubscribe to many clicks of the update button and deliver the last randText() call.  
+- Seems like randText() call is synchronous.
+- I had a little confusion why debounce was used.  The debounce pertains to the state and not the buttons in the html.  
+- If you don't use debounce, your stream will emit everytime a new value is patched to your state.   
+- "If you add a new value to todos and loading at the same time, viewmodel will emit twice, but with debounce, it will only emit once because we wait that the state is settled."  
+- I used a simplified callState with just a string - versus an enum with various states and a separate errorState.
+- I used a global spinner that renders when callState is "loading" - use toLowerCase on callState in the html.  
 - A todo item component would require a separate component store with update and delete methods.  The app store would not have those methods.  
 - I think it is possible to have a todo-item component without adding a component store to it.  You would need to add {providedIn: 'root'} to app store injectable decorator and then inject the store in the todo item component.  This approach makes the store like a service.  
 - Not a lot of great learning material out there on testing ngrx stores.
-- Once again, I think ngrx has had a lot of changes that are not really reflected in the documentation out there.  
+- Once again, I think ngrx has had a lot of changes that are not really reflected in the documentation out there.     
 
 ## Need to change angular.json to suppress a commonjs warning caused by a dependency in the @ngneat/falso package
 
