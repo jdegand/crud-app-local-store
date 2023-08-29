@@ -18,6 +18,8 @@ export class TodoService {
   // in this case, it is faked
   // only title will change with random text from falso package
   // if you delete headers -> won't work -> text will just disappear
+  // the update discards the other properties of the todo object
+  // to save all other properties -> need to pass todo object 
   updateTodo(id: number) {
     return this.http.put<Todo>(
       `https://jsonplaceholder.typicode.com/todos/${id}`,

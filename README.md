@@ -92,7 +92,7 @@ this.todos = [...this.todos.filter((t) => t.id !== todoUpdated.id), todoUpdated]
 - If you don't use debounce, your stream will emit everytime a new value is patched to your state.   
 - "If you add a new value to todos and loading at the same time, viewmodel will emit twice, but with debounce, it will only emit once because we wait that the state is settled."  
 - I used a simplified callState with just a string - versus an enum with various states and a separate errorState.
-- I used a global spinner that renders when callState is "loading" - use toLowerCase on callState in the html.  
+- I used a global spinner that renders when callState is "loading" - used toLowerCase on callState in the html.  
 - A todo item component would require a separate component store with update and delete methods.  The app store would not have those methods.  
 - I think it is possible to have a todo-item component without adding a component store to it.  You would need to add {providedIn: 'root'} to app store injectable decorator and then inject the store in the todo item component.  This approach makes the store like a service.  
 - Not a lot of great learning material out there on testing ngrx stores.
@@ -116,10 +116,11 @@ this.todos = [...this.todos.filter((t) => t.id !== todoUpdated.id), todoUpdated]
 
 - Right now, pretty much completed step 3
 - TodoItem Component -> need a store, move update and delete methods to that store
-- Move update and delete tests to TodoItem
+- Move update and delete tests to TodoItemStore test 
 
 ## Useful Resources
 
+- [Medium](https://medium.com/@thomas.laforge/discover-the-power-of-ngrx-component-store-to-create-a-local-component-state-53e3a0af7970) - thomas laforge solution
 - [YouTube](https://www.youtube.com/watch?v=qRAhe06UhM4) - Keeping Side Effects out of your Angular Components with NgRx ComponentStore
 - [YouTube](https://www.youtube.com/watch?v=xPmtsD5LRqQ) - How to use NgRx ComponentStore? - Alex Okrushko | NG-DE 2022
 - [loading.io](https://loading.io/css/) - css loading spinners
@@ -142,3 +143,5 @@ this.todos = [...this.todos.filter((t) => t.id !== todoUpdated.id), todoUpdated]
 - [Medium](https://medium.com/@rogerg93/how-to-unit-test-the-ngrx-component-store-in-angular-3ad395a21cbd) - how to unit test the ngrx component store
 - [Github](https://github.com/ngrx/platform/discussions/3335) - RFC: Add "ngrxOnInitStore" lifecycle method to ComponentStore #3335
 - [Stack Overflow](https://stackoverflow.com/questions/61446014/observablevoid-doesnt-invoke-the-subscriber) - observable void doesn't invoke the subscriber
+- [Github](https://github.com/ngrx/platform/issues/2991) - not initialized store if using constructor
+- [Stack Overflow](https://stackoverflow.com/questions/74105159/getting-ng-rx-component-store-error-mystore-has-not-been-initialized-yet-when) - getting ng rx component store not initialized error
