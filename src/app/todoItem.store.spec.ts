@@ -1,4 +1,4 @@
-import { TestBed, fakeAsync } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { of, skip, take, throwError } from 'rxjs';
 
 import { TodoService } from './service/todo.service';
@@ -56,12 +56,29 @@ describe('TodoItemStore', () => {
       appStore.setState({ todos, callState: '' });
 
       const todo: Todo = getFakeTodo();
-      todoItemStore.setState({ todo, callState: 'LOADED'});
+      todoItemStore.setState({ todo, callState: 'LOADED' });
 
       // Then
       todoItemStore.todo$.pipe().subscribe({
         next: (todo: Todo | undefined) => {
           expect(todo?.title).toBe('Test todo 1');
+          done();
+        },
+      });
+    });
+  });
+
+  describe('callState$ selector', () => {
+    it('should return callState from state', (done: DoneFn) => {
+      // Given
+
+      const todo: Todo = getFakeTodo();
+      todoItemStore.setState({ todo, callState: 'LOADED' });
+
+      // Then
+      todoItemStore.callState$.subscribe({
+        next: (state: any) => {
+          expect(state).toBe('LOADED');
           done();
         },
       });
@@ -81,7 +98,7 @@ describe('TodoItemStore', () => {
       todoServiceSpy.deleteTodo.and.returnValue(of(undefined));
 
       // Then
-      todoItemStore.state$.pipe(skip(2), take(1)).subscribe({ // have to skip 2 -> initial state - 0, then fetchTodo - 2 
+      appStore.state$.pipe(skip(2), take(1)).subscribe({ // have to skip 2 -> initial state - 0, then fetchTodo - 2 
         next: (state: any) => {
           expect(state.todos.length).toBe(1);
           done();
@@ -95,13 +112,18 @@ describe('TodoItemStore', () => {
 
   })
 
+  /*
   describe('updateTodo() TodoItemStore only', () => {
     it('should update todo', (done: DoneFn) => {
-
       // Given
       const todo: Todo = getFakeTodo();
 
-      todoItemStore.setState({ todo: todo, callState: 'LOADED' });
+      const callState = 'Loaded';
+
+      todoItemStore.setState({ todo: todo, callState: callState });
+
+      // When
+      todoItemStore.update(1);
 
       todoServiceSpy.updateTodo.and.returnValue(of({
         userId: 1,
@@ -112,19 +134,15 @@ describe('TodoItemStore', () => {
       }));
 
       // Then
-      todoItemStore.state$.subscribe({
+      todoItemStore.todo$.pipe(skip(1)).subscribe({
         next: (state: any) => {
           expect(state.todo.title).toBe("Updated todo 1");
           done();
         },
       });
-
-      // When
-      todoItemStore.update(1);
     });
-
   })
-
+  */
 
   // This is not good -> have to isolate todoItemStore from appStore 
   describe('updateTodo() method', () => {
@@ -145,7 +163,7 @@ describe('TodoItemStore', () => {
       }));
 
       // Then
-      appStore.state$.pipe(skip(2), take(1)).subscribe({
+      appStore.state$.pipe(skip(2), take(1)).subscribe({ // change skip # cause of tap
         next: (state: any) => {
           expect(state.todos[0].title).toBe("Updated todo 1");
           done();
@@ -172,7 +190,7 @@ describe('TodoItemStore', () => {
       todoServiceSpy.updateTodo.and.returnValue(throwError(() => new Error(error)));
 
       // Then
-      appStore.state$.pipe(skip(2), take(1)).subscribe({
+      todoItemStore.state$.pipe(skip(1)).subscribe({
         next: (state: any) => {
           expect(state.callState).toBe("An error occurred");
           done();

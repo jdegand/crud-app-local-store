@@ -98,7 +98,6 @@ this.todos = [...this.todos.filter((t) => t.id !== todoUpdated.id), todoUpdated]
 - Not a lot of great learning material out there on testing ngrx stores.
 - Thomas' solution doesn't have tests and other solutions don't either.
 - Once again, I think ngrx has had a lot of changes that are not really reflected in the documentation out there. 
-- 'tap' always screws up tests.
 - Can't really show individual loading when the todos are being fetched -> you can show loading when deleting and updating actions are performed.
 - Instead of disabling buttons `[disabled]='vm.callState === 'Updating' '`, just removed the todo and the buttons from the html by conditional rendering them.  
 - Both stores have callState properties -> can show spinner when loading the todos and then show status of update / delete actions in the TodoItemComponent
@@ -119,8 +118,8 @@ this.todos = [...this.todos.filter((t) => t.id !== todoUpdated.id), todoUpdated]
 
 ## Continued Development
 
-- Loading states in todo-item component html with conditional logic
 - Better test isolation
+- Typescript improvements -> problems from conditional logic -> todo might be undefined, etc.
 
 ## Useful Resources
 

@@ -31,7 +31,6 @@ export class TodoItemStore extends ComponentStore<TodoItemState> {
         { debounce: true }
     );
 
-    // adding tap for callState -> ruined tests
     readonly update = this.effect<number>(
         pipe(
             tap(() => this.setState({callState: 'Updating'})),
