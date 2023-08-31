@@ -94,9 +94,14 @@ this.todos = [...this.todos.filter((t) => t.id !== todoUpdated.id), todoUpdated]
 - I used a simplified callState with just a string - versus an enum with various states and a separate errorState.
 - I used a global spinner that renders when callState is "loading" - used toLowerCase on callState in the html.  
 - A todo item component would require a separate component store with update and delete methods.  The app store would not have those methods.  
-- I think it is possible to have a todo-item component without adding a component store to it.  You would need to add {providedIn: 'root'} to app store injectable decorator and then inject the store in the todo item component.  This approach makes the store like a service.  
+- I think it is possible to have a todo-item component without adding a component store to it.  You would need to add {providedIn: 'root'} to app store injectable decorator and then inject the store in the todo item component.  This approach makes the store like a service.  [See this video for a hybrid approach](https://www.youtube.com/watch?v=EBQE5drdBuE).
 - Not a lot of great learning material out there on testing ngrx stores.
-- Once again, I think ngrx has had a lot of changes that are not really reflected in the documentation out there.     
+- Thomas' solution doesn't have tests and other solutions don't either.
+- Once again, I think ngrx has had a lot of changes that are not really reflected in the documentation out there. 
+- 'tap' always screws up tests.
+- Can't really show individual loading when the todos are being fetched -> you can show loading when deleting and updating actions are performed.
+- Instead of disabling buttons `[disabled]='vm.callState === 'Updating' '`, just removed the todo and the buttons from the html by conditional rendering them.  
+- Both stores have callState properties -> can show spinner when loading the todos and then show status of update / delete actions in the TodoItemComponent
 
 ## Need to change angular.json to suppress a commonjs warning caused by a dependency in the @ngneat/falso package
 
@@ -114,9 +119,8 @@ this.todos = [...this.todos.filter((t) => t.id !== todoUpdated.id), todoUpdated]
 
 ## Continued Development
 
-- Right now, pretty much completed step 3
-- TodoItem Component -> need a store, move update and delete methods to that store
-- Move update and delete tests to TodoItemStore test 
+- Loading states in todo-item component html with conditional logic
+- Better test isolation
 
 ## Useful Resources
 
@@ -145,3 +149,7 @@ this.todos = [...this.todos.filter((t) => t.id !== todoUpdated.id), todoUpdated]
 - [Stack Overflow](https://stackoverflow.com/questions/61446014/observablevoid-doesnt-invoke-the-subscriber) - observable void doesn't invoke the subscriber
 - [Github](https://github.com/ngrx/platform/issues/2991) - not initialized store if using constructor
 - [Stack Overflow](https://stackoverflow.com/questions/74105159/getting-ng-rx-component-store-error-mystore-has-not-been-initialized-yet-when) - getting ng rx component store not initialized error
+- [Github](https://github.com/ngxs/store/issues/640) - need to mutate state when using patchState 
+- [Stack Overflow](https://stackoverflow.com/questions/35328652/angular-pass-callback-function-to-child-component-as-input-similar-to-angularjs) - angular pass callback function to child component as input
+- [Stack Overflow](https://stackoverflow.com/questions/36654834/angular2-unit-test-with-input) - unit test with input
+- [Stack Overflow](https://stackoverflow.com/questions/42656045/angular2-testing-and-resolved-data-how-to-test-ngoninit) - testing ngOnInit
