@@ -1,7 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { ComponentStore, OnStateInit, tapResponse } from '@ngrx/component-store';
-import { Observable, exhaustMap, pipe, switchMap } from 'rxjs';
+import { ComponentStore, OnStateInit, OnStoreInit, tapResponse } from '@ngrx/component-store';
+import { Observable, exhaustMap } from 'rxjs';
 
 import { Todo } from './interfaces/Todo';
 import { TodoService } from './service/todo.service';
@@ -15,15 +15,16 @@ export interface AppState {
 // is it really necessary to create another store just for a presentational component?
 // pass update / delete methods to TodoItemComponent?
 @Injectable()
-export class AppStore extends ComponentStore<AppState> implements OnStateInit {
+export class AppStore extends ComponentStore<AppState> implements OnStateInit, OnStoreInit {
 
     // making todo$ and callState$ -> private -> makes testing more difficult ?
     readonly todos$: Observable<Todo[]> = this.select((state) => state.todos);
     readonly callState$: Observable<string> = this.select((state) => state.callState);
 
-    constructor(private todoService: TodoService) {
-        super({ todos: [], callState: "Loading" });
-        // this.fetchTodo(); -> remove onStateInit -> can call fetchTodo in constructor -> would have to change tests 
+    todoService = inject(TodoService)
+
+    ngrxOnStoreInit() {
+        this.setState({ todos: [], callState: 'Loading' })
     }
 
     ngrxOnStateInit() {
@@ -50,34 +51,6 @@ export class AppStore extends ComponentStore<AppState> implements OnStateInit {
                             this.patchState({ callState: error.message })
                     )
                 )
-            )
-        )
-    );
-
-    readonly update = this.effect<number>(
-        pipe(
-            //tap(() => this.patchState({ callState: "Loading" })),
-            switchMap((id) => this.todoService.updateTodo(id).pipe(
-                tapResponse(
-                    (todo: any) => this.updateTodo(todo),
-                    (error: Error) =>
-                        this.patchState({ callState: error.message })
-                )
-            )
-            )
-        )
-    );
-
-    readonly deleteTodo = this.effect<number>(
-        pipe(
-            //tap(() => this.patchState({ callState: "Loading" })),
-            switchMap((id) => this.todoService.deleteTodo(id).pipe(
-                tapResponse(
-                    () => this.deleteTodoState(id),
-                    (error: Error) =>
-                        this.patchState({ callState: error.message })
-                )
-            )
             )
         )
     );

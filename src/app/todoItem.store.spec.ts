@@ -1,11 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 import { of, skip, take, throwError } from 'rxjs';
 
-import { AppState, AppStore } from './app.store';
 import { TodoService } from './service/todo.service';
 import { Todo } from './interfaces/Todo';
+import { TodoItemStore } from './todoItem.store';
+import { AppStore } from './app.store';
 
-describe('AppStore', () => {
+describe('TodoItemStore', () => {
+  let todoItemStore: TodoItemStore;
   let appStore: AppStore;
   let todoServiceSpy: jasmine.SpyObj<TodoService>;
 
@@ -19,31 +21,47 @@ describe('AppStore', () => {
     TestBed.configureTestingModule({
       providers: [
         AppStore,
-        { provide: TodoService, useValue: todoServiceSpyObj },
+        TodoItemStore,
+        { provide: TodoService, useValue: todoServiceSpyObj }
       ],
     });
 
     appStore = TestBed.inject(AppStore);
+    todoItemStore = TestBed.inject(TodoItemStore);
     todoServiceSpy = TestBed.inject(
       TodoService
     ) as jasmine.SpyObj<TodoService>;
-    appStore.setState({ todos: [], callState: 'Loading' });
   });
 
   it('should be created', () => {
-    expect(appStore).toBeTruthy();
+    expect(todoItemStore).toBeTruthy();
   });
 
-  describe('todos$ selector', () => {
+  it('ngOnInit', (done: DoneFn) => {
+    todoItemStore.ngOnInit();
+    todoItemStore.todo$.subscribe({
+      next: (todo: Todo | undefined) => {
+        expect(todo).toBe(undefined);
+        done();
+      }
+    })
+  })
+
+  describe('todo$ selector', () => {
     it('should return todos from state', (done: DoneFn) => {
       // Given
+
       const todos: Todo[] = getFakeTodos();
-      appStore.patchState({ todos });
+
+      appStore.setState({ todos, callState: '' });
+
+      const todo: Todo = getFakeTodo();
+      todoItemStore.setState({ todo, callState: 'LOADED' });
 
       // Then
-      appStore.todos$.pipe().subscribe({
-        next: (todos: Todo[]) => {
-          expect(todos.length).toBe(todos.length);
+      todoItemStore.todo$.pipe().subscribe({
+        next: (todo: Todo | undefined) => {
+          expect(todo?.title).toBe('Test todo 1');
           done();
         },
       });
@@ -53,72 +71,35 @@ describe('AppStore', () => {
   describe('callState$ selector', () => {
     it('should return callState from state', (done: DoneFn) => {
       // Given
-      const callState = "Loading";
-      appStore.patchState({ callState });
+
+      const todo: Todo = getFakeTodo();
+      todoItemStore.setState({ todo, callState: 'LOADED' });
 
       // Then
-      appStore.callState$.pipe().subscribe({
-        next: (callState: string) => {
-          expect(callState).toBe("Loading");
+      todoItemStore.callState$.subscribe({
+        next: (state: any) => {
+          expect(state).toBe('LOADED');
           done();
         },
       });
     });
   });
 
-  describe('fetchTodo() method', () => {
-    it('should update state with returned todos', (done: DoneFn) => {
-
-      appStore.patchState({ todos: [] });
-
-      // Given
-      const todos: Todo[] = getFakeTodos();
-      todoServiceSpy.getTodos.and.returnValue(of(todos));
-
-      // Then
-      appStore.state$.pipe(skip(1), take(1)).subscribe({
-        next: (state: AppState) => {
-          expect(state.todos).toEqual(todos);
-          done();
-        },
-      });
-
-      // When
-      appStore.fetchTodo();
-    });
-
-    it('should update the state with an error message if an error occurs', (done: DoneFn) => {
-      // Given
-      const error = 'An error occurred';
-      todoServiceSpy.getTodos.and.returnValue(
-        throwError(() => new Error(error))
-      );
-
-      // Then
-      appStore.state$.pipe(skip(1), take(1)).subscribe({
-        next: (state: AppState) => {
-          expect(state.callState).toEqual(error);
-          done();
-        },
-      });
-
-      // When
-      appStore.fetchTodo();
-    });
-  });
-
-  /*
   describe('deleteTodo() method', () => {
     it('should delete todo', (done: DoneFn) => {
 
-      // Given
       const todos: Todo[] = getFakeTodos();
+
+      appStore.setState({ todos, callState: '' });
+
+      // Given
+
       todoServiceSpy.getTodos.and.returnValue(of(todos));
       todoServiceSpy.deleteTodo.and.returnValue(of(undefined));
 
       // Then
       appStore.state$.pipe(skip(2), take(1)).subscribe({ // have to skip 2 -> initial state - 0, then fetchTodo - 2 
-        next: (state: AppState) => {
+        next: (state: any) => {
           expect(state.todos.length).toBe(1);
           done();
         },
@@ -126,7 +107,7 @@ describe('AppStore', () => {
 
       // When
       appStore.fetchTodo();
-      appStore.deleteTodo(2);
+      todoItemStore.deleteTodo(2);
     });
 
   })
@@ -137,12 +118,15 @@ describe('AppStore', () => {
       // Given
       const error = 'An error occurred';
       const todos: Todo[] = getFakeTodos();
+
+      appStore.setState({ todos, callState: '' });
+
       todoServiceSpy.getTodos.and.returnValue(of(todos));
       todoServiceSpy.deleteTodo.and.returnValue(throwError(() => new Error(error)));
 
       // Then
-      appStore.state$.pipe(skip(2), take(1)).subscribe({  // skip(1) -> callState is "LOADED" 
-        next: (state: AppState) => {
+      todoItemStore.state$.pipe(skip(1)).subscribe({
+        next: (state: any) => {
           expect(state.callState).toBe("An error occurred");
           done();
         },
@@ -150,16 +134,52 @@ describe('AppStore', () => {
 
       // When
       appStore.fetchTodo();
-      appStore.deleteTodo(1);
+      todoItemStore.deleteTodo(1);
     });
 
   })
 
+  /*
+  describe('updateTodo() TodoItemStore only', () => {
+    it('should update todo', (done: DoneFn) => {
+      // Given
+      const todo: Todo = getFakeTodo();
+
+      const callState = 'Loaded';
+
+      todoItemStore.setState({ todo: todo, callState: callState });
+
+      // When
+      todoItemStore.update(1);
+
+      todoServiceSpy.updateTodo.and.returnValue(of({
+        userId: 1,
+        id: 1,
+        title: 'Updated todo 1',
+        completed: false,
+        body: 'Test todo 1'
+      }));
+
+      // Then
+      todoItemStore.todo$.pipe(skip(1)).subscribe({
+        next: (state: any) => {
+          expect(state.todo.title).toBe("Updated todo 1");
+          done();
+        },
+      });
+    });
+  })
+  */
+
+  // This is not good -> have to isolate todoItemStore from appStore 
   describe('updateTodo() method', () => {
     it('should update todo', (done: DoneFn) => {
 
       // Given
       const todos: Todo[] = getFakeTodos();
+
+      appStore.setState({ todos, callState: '' });
+
       todoServiceSpy.getTodos.and.returnValue(of(todos));
       todoServiceSpy.updateTodo.and.returnValue(of({
         userId: 1,
@@ -170,8 +190,8 @@ describe('AppStore', () => {
       }));
 
       // Then
-      appStore.state$.pipe(skip(2), take(1)).subscribe({
-        next: (state: AppState) => {
+      appStore.state$.pipe(skip(2), take(1)).subscribe({ // change skip # cause of tap
+        next: (state: any) => {
           expect(state.todos[0].title).toBe("Updated todo 1");
           done();
         },
@@ -179,7 +199,7 @@ describe('AppStore', () => {
 
       // When
       appStore.fetchTodo();
-      appStore.update(1);
+      todoItemStore.update(1);
     });
 
   })
@@ -190,12 +210,15 @@ describe('AppStore', () => {
       // Given
       const error = 'An error occurred';
       const todos: Todo[] = getFakeTodos();
+
+      appStore.setState({ todos, callState: '' });
+
       todoServiceSpy.getTodos.and.returnValue(of(todos));
       todoServiceSpy.updateTodo.and.returnValue(throwError(() => new Error(error)));
 
       // Then
-      appStore.state$.pipe(skip(2), take(1)).subscribe({
-        next: (state: AppState) => {
+      todoItemStore.state$.pipe(skip(1)).subscribe({
+        next: (state: any) => {
           expect(state.callState).toBe("An error occurred");
           done();
         },
@@ -203,13 +226,22 @@ describe('AppStore', () => {
 
       // When
       appStore.fetchTodo();
-      appStore.update(1);
+      todoItemStore.update(1);
     });
 
   })
-  */
 
 })
+
+export function getFakeTodo(): Todo {
+  return {
+    userId: 1,
+    id: 1,
+    title: 'Test todo 1',
+    completed: false,
+    body: 'Test todo 1'
+  };
+}
 
 export function getFakeTodos(): Todo[] {
   return [

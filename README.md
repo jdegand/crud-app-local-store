@@ -94,9 +94,19 @@ this.todos = [...this.todos.filter((t) => t.id !== todoUpdated.id), todoUpdated]
 - I used a simplified callState with just a string - versus an enum with various states and a separate errorState.
 - I used a global spinner that renders when callState is "loading" - used toLowerCase on callState in the html.  
 - A todo item component would require a separate component store with update and delete methods.  The app store would not have those methods.  
-- I think it is possible to have a todo-item component without adding a component store to it.  You would need to add {providedIn: 'root'} to app store injectable decorator and then inject the store in the todo item component.  This approach makes the store like a service.  
+- I think it is possible to have a todo-item component without adding a component store to it.  You would need to add {providedIn: 'root'} to app store injectable decorator and then inject the store in the todo item component.  This approach makes the store like a service.  [See this video for a hybrid approach](https://www.youtube.com/watch?v=EBQE5drdBuE).
 - Not a lot of great learning material out there on testing ngrx stores.
-- Once again, I think ngrx has had a lot of changes that are not really reflected in the documentation out there.     
+- Thomas' solution doesn't have tests and other solutions don't either.
+- Once again, I think ngrx has had a lot of changes that are not really reflected in the documentation out there. 
+- Can't really show individual loading when the todos are being fetched -> you can show loading when deleting and updating actions are performed.
+- Instead of disabling buttons `[disabled]='vm.callState === 'Updating' '`, just removed the todo and the buttons from the html by conditional rendering them.  
+- Both stores have callState properties -> can show spinner when loading the todos and then show status of update / delete actions in the TodoItemComponent
+- Where you put `fixture.detectChanges` matters and moving the call to it could make a failing test pass. 
+- The previous todoItem html made testing more difficult.  I changed the html and it ended up more like the original directions requirements.    
+- Most likely, you will have to activate slow mode in devtools to actually see the buttons disable.  
+- The todo title disappears when updating / deleting.  It would be preferrable to have it stay until either action completes.  
+- I pretty much got the application tested.  Some tests are definitely not ideal but I am working off limited documentation and few practical examples I can follow.
+- The TodoItemStore.vm$ observable is readonly so it is saved to a different variable in the todo-item component so you can override it in the todo item test.  
 
 ## Need to change angular.json to suppress a commonjs warning caused by a dependency in the @ngneat/falso package
 
@@ -114,9 +124,8 @@ this.todos = [...this.todos.filter((t) => t.id !== todoUpdated.id), todoUpdated]
 
 ## Continued Development
 
-- Right now, pretty much completed step 3
-- TodoItem Component -> need a store, move update and delete methods to that store
-- Move update and delete tests to TodoItemStore test 
+- Better test isolation
+- Typescript improvements -> problems from conditional logic -> todo might be undefined, etc.
 
 ## Useful Resources
 
@@ -145,3 +154,13 @@ this.todos = [...this.todos.filter((t) => t.id !== todoUpdated.id), todoUpdated]
 - [Stack Overflow](https://stackoverflow.com/questions/61446014/observablevoid-doesnt-invoke-the-subscriber) - observable void doesn't invoke the subscriber
 - [Github](https://github.com/ngrx/platform/issues/2991) - not initialized store if using constructor
 - [Stack Overflow](https://stackoverflow.com/questions/74105159/getting-ng-rx-component-store-error-mystore-has-not-been-initialized-yet-when) - getting ng rx component store not initialized error
+- [Github](https://github.com/ngxs/store/issues/640) - need to mutate state when using patchState 
+- [Stack Overflow](https://stackoverflow.com/questions/35328652/angular-pass-callback-function-to-child-component-as-input-similar-to-angularjs) - angular pass callback function to child component as input
+- [Stack Overflow](https://stackoverflow.com/questions/36654834/angular2-unit-test-with-input) - unit test with input
+- [Stack Overflow](https://stackoverflow.com/questions/42656045/angular2-testing-and-resolved-data-how-to-test-ngoninit) - testing ngOnInit
+- [Stack Overflow](https://stackoverflow.com/questions/50137734/detectchanges-not-working-within-angular-test) - detect changes 
+- [Stack Overflow](https://stackoverflow.com/questions/52332314/unit-test-angular-input-set-function-not-triggered) - unit test input set function not triggered
+- [Stack Overflow](https://stackoverflow.com/questions/52111750/angular-testing-an-input-with-a-set-attached-to-it) - angular testing an input with a set attached to it
+- [Stack Overflow](https://stackoverflow.com/questions/49288024/how-to-mock-ngrx-selector-in-a-component) - mock ngrx selector in a component
+- [Stack Overflow](https://stackoverflow.com/questions/53850889/cant-find-button-inside-a-ngif-statement-while-testing-because-statement-invol) - can't find button inside ngIf statement
+- [Stack Overflow](https://stackoverflow.com/questions/43111905/override-read-only-object-within-a-jasmine-unit-test) - override read only object within a jasmine unit test
