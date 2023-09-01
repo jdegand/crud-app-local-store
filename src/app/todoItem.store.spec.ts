@@ -112,6 +112,33 @@ describe('TodoItemStore', () => {
 
   })
 
+  describe('deleteTodo() method error', () => {
+    it('should have error', (done: DoneFn) => {
+
+      // Given
+      const error = 'An error occurred';
+      const todos: Todo[] = getFakeTodos();
+
+      appStore.setState({ todos, callState: '' });
+
+      todoServiceSpy.getTodos.and.returnValue(of(todos));
+      todoServiceSpy.deleteTodo.and.returnValue(throwError(() => new Error(error)));
+
+      // Then
+      todoItemStore.state$.pipe(skip(1)).subscribe({
+        next: (state: any) => {
+          expect(state.callState).toBe("An error occurred");
+          done();
+        },
+      });
+
+      // When
+      appStore.fetchTodo();
+      todoItemStore.deleteTodo(1);
+    });
+
+  })
+
   /*
   describe('updateTodo() TodoItemStore only', () => {
     it('should update todo', (done: DoneFn) => {
