@@ -16,6 +16,10 @@
 
 ***
 
+![](screenshots/crud-app-local-store-deleting.png)
+
+***
+
 ![](screenshots/crud-app-local-store-4.png "Todo 1 deleted")
 
 ***
@@ -87,7 +91,7 @@ this.todos = [...this.todos.filter((t) => t.id !== todoUpdated.id), todoUpdated]
 - I think *ngrxLet implementation is unnecessary in this implementation.  The api will never return 0 todos and to have zero todos rendered in the html a user would need to delete 200 todos.   
 - Adding *ngrxLet is not free since you need to add another dependency - @ngrx/component.  
 - In Thomas's solution, he uses a switchMap and {debounce: true}.  switchMap is needed to unsubscribe to many clicks of the update button and deliver the last randText() call.  
-- Seems like randText() call is synchronous.
+- It seems like the randText() call is synchronous.
 - I had a little confusion why debounce was used.  The debounce pertains to the state and not the buttons in the html.  
 - If you don't use debounce, your stream will emit everytime a new value is patched to your state.   
 - "If you add a new value to todos and loading at the same time, viewmodel will emit twice, but with debounce, it will only emit once because we wait that the state is settled."  
@@ -99,13 +103,13 @@ this.todos = [...this.todos.filter((t) => t.id !== todoUpdated.id), todoUpdated]
 - Thomas' solution doesn't have tests and other solutions don't either.
 - Once again, I think ngrx has had a lot of changes that are not really reflected in the documentation out there. 
 - Can't really show individual loading when the todos are being fetched -> you can show loading when deleting and updating actions are performed.
-- Instead of disabling buttons `[disabled]='vm.callState === 'Updating' '`, just removed the todo and the buttons from the html by conditional rendering them.  
+- Instead of disabling buttons ie `[disabled]="vm.callState === 'Updating' "`, I initially just removed the todo title and the buttons from the html by conditional rendering them.  
 - Both stores have callState properties -> can show spinner when loading the todos and then show status of update / delete actions in the TodoItemComponent
 - Where you put `fixture.detectChanges` matters and moving the call to it could make a failing test pass. 
-- The previous todoItem html made testing more difficult.  I changed the html and it ended up more like the original directions requirements.    
+- The commented-out html in `todo-item.component.html` is harder to test, so I changed the html, and it ended up more like the original directions' requirements.   
 - Most likely, you will have to activate slow mode in devtools to actually see the buttons disable.  
 - The todo title disappears when updating / deleting.  It would be preferrable to have it stay until either action completes.  
-- I pretty much got the application tested.  Some tests are definitely not ideal but I am working off limited documentation and few practical examples I can follow.
+- The application is fully tested.  Some tests are definitely not ideal, but I am working off limited documentation and few practical examples I can follow.
 - The TodoItemStore.vm$ observable is readonly so it is saved to a different variable in the todo-item component so you can override it in the todo item test.  
 
 ## Need to change angular.json to suppress a commonjs warning caused by a dependency in the @ngneat/falso package
