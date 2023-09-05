@@ -2,9 +2,13 @@
 
 [Angular Challenges](https://github.com/tomalaforge/angular-challenges) #5 (crud) solution.
 
+## Live Link
+
+[Github Pages](https://jdegand.github.io/crud-app-local-store)
+
 ## Screenshots
 
-![](screenshots/crud-app-local-store-1.png)
+![](screenshots/crud-app-local-store-1.png "Global Loading Indicator")
 
 ***
 
@@ -16,11 +20,11 @@
 
 ***
 
-![](screenshots/crud-app-local-store-deleting.png)
+![](screenshots/crud-app-local-store-4.png "Todo 1 deleted")
 
 ***
 
-![](screenshots/crud-app-local-store-4.png "Todo 1 deleted")
+![](screenshots/crud-app-local-store-deleting.png "Deleting or updating disables opposite button")
 
 ***
 
