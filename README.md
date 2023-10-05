@@ -81,7 +81,7 @@ this.todos = [...this.todos.filter((t) => t.id !== todoUpdated.id), todoUpdated]
 
 ## Thoughts
 
-- There are no actions in a component store implemenation.
+- There are no actions in a component store implementation.
 - It is not worth adding Angular Material for a spinner.  All you need is a simple component and a simple css animation.
 - You can get a loading spinner from [loading.io](https://loading.io/css/).   
 - OnPush works by comparing references of the inputs of the component.  If you do not provide a reference to a new object and instead mutate an existing one, the OnPush change detector will not get triggered.  To keep your ui in sync with state, you need to create new objects.  
