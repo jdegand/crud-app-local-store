@@ -38,7 +38,7 @@ describe('TodoItemStore', () => {
   });
 
   it('ngOnInit', (done: DoneFn) => {
-    todoItemStore.ngOnInit();
+    
     todoItemStore.todo$.subscribe({
       next: (todo: Todo | undefined) => {
         expect(todo).toBe(undefined);

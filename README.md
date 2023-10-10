@@ -78,6 +78,7 @@ this.todos = [...this.todos.filter((t) => t.id !== todoUpdated.id), todoUpdated]
 
 - [Angular CLI](https://github.com/angular/angular-cli) version 16.2.0.
 - [Angular](https://angular.io)
+- [NgRx](https://ngrx.io)
 
 ## Thoughts
 
@@ -115,6 +116,8 @@ this.todos = [...this.todos.filter((t) => t.id !== todoUpdated.id), todoUpdated]
 - The todo title disappears when updating / deleting.  It would be preferrable to have it stay until either action completes.  
 - The application is fully tested.  Some tests are definitely not ideal, but I am working off limited documentation and few practical examples I can follow.
 - The TodoItemStore.vm$ observable is readonly so it is saved to a different variable in the todo-item component so you can override it in the todo item test.  
+- Updating/Deleting tests have async problems.  The callState is being updated so the html can't be queried.  Need to investigate more.
+- The TodoItemStore was not initialized correctly.  This didn't prevent the app from working because I used setState instead of patchState in the todo-item Input set method.
 
 ## Need to change angular.json to suppress a commonjs warning caused by a dependency in the @ngneat/falso package
 
