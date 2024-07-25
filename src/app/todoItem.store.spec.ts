@@ -38,7 +38,7 @@ describe('TodoItemStore', () => {
   });
 
   it('ngOnInit', (done: DoneFn) => {
-    
+
     todoItemStore.todo$.subscribe({
       next: (todo: Todo | undefined) => {
         expect(todo).toBe(undefined);
@@ -138,38 +138,6 @@ describe('TodoItemStore', () => {
     });
 
   })
-
-  /*
-  describe('updateTodo() TodoItemStore only', () => {
-    it('should update todo', (done: DoneFn) => {
-      // Given
-      const todo: Todo = getFakeTodo();
-
-      const callState = 'Loaded';
-
-      todoItemStore.setState({ todo: todo, callState: callState });
-
-      // When
-      todoItemStore.update(1);
-
-      todoServiceSpy.updateTodo.and.returnValue(of({
-        userId: 1,
-        id: 1,
-        title: 'Updated todo 1',
-        completed: false,
-        body: 'Test todo 1'
-      }));
-
-      // Then
-      todoItemStore.todo$.pipe(skip(1)).subscribe({
-        next: (state: any) => {
-          expect(state.todo.title).toBe("Updated todo 1");
-          done();
-        },
-      });
-    });
-  })
-  */
 
   // This is not good -> have to isolate todoItemStore from appStore 
   describe('updateTodo() method', () => {
