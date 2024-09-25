@@ -10,8 +10,7 @@ import { Todo } from 'src/app/interfaces/Todo';
   standalone: true,
   imports: [CommonModule, LoadingSpinnerComponent],
   providers: [provideComponentStore(TodoItemStore)],
-  templateUrl: './todo-item.component.html',
-  styleUrls: ['./todo-item.component.css'],
+  templateUrl: './todo-item.component.html'
   // might not need changeDetection: ChangeDetectionStrategy.OnPush, as @Input() will cause the component to be updated 
 })
 
