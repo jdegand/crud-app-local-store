@@ -27,6 +27,6 @@ import { TodoItemComponent } from './components/todo-item/todo-item.component';
 })
 
 export class AppComponent {
-  private appStore = inject(AppStore);
+  private readonly appStore = inject(AppStore);
   vm$ = this.appStore.vm$;
 }

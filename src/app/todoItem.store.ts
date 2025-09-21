@@ -12,8 +12,8 @@ export interface TodoItemState {
 
 @Injectable()
 export class TodoItemStore extends ComponentStore<TodoItemState> {
-    private todoService = inject(TodoService);
-    private appStore = inject(AppStore);
+    private readonly todoService = inject(TodoService);
+    private readonly appStore = inject(AppStore);
 
     // mistakenly used ngOnInit -> that doesn't work inside Injectable()
     constructor(){

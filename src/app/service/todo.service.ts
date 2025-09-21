@@ -8,7 +8,7 @@ import { Todo } from '../interfaces/Todo';
 })
 export class TodoService {
 
-  constructor(private http: HttpClient) { }
+  constructor(private readonly http: HttpClient) { }
 
   getTodos() {
     return this.http.get('https://jsonplaceholder.typicode.com/todos');
