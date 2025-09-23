@@ -19,7 +19,7 @@ export class TodoItemComponent {
     this.todoItemStore.patchState({todo: todo, callState: 'LOADED' }); 
   }
 
-  private todoItemStore = inject(TodoItemStore);
+  private readonly todoItemStore = inject(TodoItemStore);
 
   vm$ = this.todoItemStore.vm$;
 
